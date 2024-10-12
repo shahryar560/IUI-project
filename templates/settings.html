@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>DeskFit Settings</title>
+</head>
+<body data-theme="{{ user.theme }}" data-font-size="{{ user.font_size }}">
+    <div class="container">
+        <h2>Settings</h2>
+
+        <!-- Customize Appearance -->
+        <h3>Customize Appearance</h3>
+        <form action="/update_preferences" method="post">
+            <label for="theme">Theme:</label>
+            <select name="theme">
+                <option value="light" {% if user.theme == 'light' %}selected{% endif %}>Light</option>
+                <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Dark</option>
+            </select>
+
+            <label for="font_size">Font Size:</label>
+            <select name="font_size">
+                <option value="small" {% if user.font_size == 'small' %}selected{% endif %}>Small</option>
+                <option value="medium" {% if user.font_size == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="large" {% if user.font_size == 'large' %}selected{% endif %}>Large</option>
+            </select>
+
+            <label for="accent_color">Accent Color:</label>
+            <input type="color" name="accent_color" value="{{ user.accent_color }}">
+
+            <button type="submit">Save Preferences</button>
+        </form>
+
+        <!-- Logout Button -->
+        <h3>Account</h3>
+        <form action="/logout" method="post">
+            <button type="submit">Log Out</button>
+        </form>
+    </div>
+</body>
+</html>

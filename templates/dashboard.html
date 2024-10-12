@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>DeskFit Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Fetch food suggestions and autocomplete calories per gram
+        function suggestFoods(query) {
+            if (query.length > 1) {
+                fetch(`/food_suggestions?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const suggestionsDiv = document.getElementById("suggestions");
+                        suggestionsDiv.innerHTML = "";  // Clear previous suggestions
+                        data.forEach(item => {
+                            const option = document.createElement("div");
+                            option.innerText = `${item.name} (${item.calories_per_gram} cal/g)`;
+                            option.onclick = () => {
+                                document.getElementById("food_name").value = item.name;
+                                document.getElementById("calories_per_gram").value = item.calories_per_gram;
+                                suggestionsDiv.innerHTML = "";  // Clear suggestions after selection
+                            };
+                            suggestionsDiv.appendChild(option);
+                        });
+                    });
+            }
+        }
+
+        // Load and display summary data on a daily bar chart
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/get_summary_data")
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('dailySummaryChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.dates,
+                            datasets: [
+                                {
+                                    label: 'Calorie Intake',
+                                    data: data.calorie_intake,
+                                    backgroundColor: '#ff6384'
+                                },
+                                {
+                                    label: 'Calories Burned',
+                                    data: data.calories_burned,
+                                    backgroundColor: '#36a2eb'
+                                },
+                                {
+                                    label: 'Water Intake (ml)',
+                                    data: data.water_intake,
+                                    backgroundColor: '#4bc0c0'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Date'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Amount'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+
+            // Apply saved accent color and theme
+            const theme = "{{ user.theme }}";
+            const fontSize = "{{ user.font_size }}";
+            const accentColor = "{{ user.accent_color }}";
+
+            document.body.setAttribute("data-theme", theme);
+            document.body.setAttribute("data-font-size", fontSize);
+            document.documentElement.style.setProperty('--accent-color', accentColor);
+        });
+    </script>
+</head>
+<body data-theme="{{ user.theme }}" data-font-size="{{ user.font_size }}">
+    <div class="container">
+        <h2>{{ user.username }}'s Dashboard</h2>
+
+        <!-- Settings Button -->
+        <div style="text-align: right; margin-bottom: 10px;">
+            <a href="{{ url_for('settings') }}" class="settings-button">Settings</a>
+        </div>
+        
+        <!-- Meal Logging -->
+        <h3>Log a Meal</h3>
+        <form action="/log_meal" method="post">
+            <input type="text" id="food_name" name="food_name" placeholder="Enter food" oninput="suggestFoods(this.value)">
+            <div id="suggestions"></div>
+            <input type="number" name="grams" placeholder="Grams" required min="0.1" step="0.1">
+            <input type="number" id="calories_per_gram" name="calories_per_gram" placeholder="Calories per gram (if new)" required min="0.1" step="0.01">
+            <button type="submit">Log Meal</button>
+        </form>
+
+        <!-- Water Intake -->
+        <h3>Log Water Intake</h3>
+        <form action="/log_water" method="post">
+            <input type="number" name="amount_ml" placeholder="Amount (ml)" required min="0.1" step="0.1">
+            <button type="submit">Log Water</button>
+        </form>
+
+        <!-- Activity Logging -->
+        <h3>Log Walking Activity</h3>
+        <form action="/log_activity" method="post">
+            <input type="number" name="duration_minutes" placeholder="Duration (minutes)" required min="1" step="1">
+            <button type="submit">Log Activity</button>
+        </form>
+
+        <!-- Daily Summary Chart -->
+        <h3>Daily Summary</h3>
+        <div>
+            <canvas id="dailySummaryChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- AI Feature for Health Status -->
+        <h3>Your Health Status</h3>
+        <div>
+        <button id="aiStatusButton" onclick="getHealthStatus()">Get My Status</button>
+        <div id="statusResponse" class="status-box"></div>
+        </div>
+
+        <script>
+        function getHealthStatus() {
+        fetch('/get_health_status')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('statusResponse').textContent = data.status;
+        })
+        .catch(error => console.error('Error fetching health status:', error));
+}
+</script>
+
+
+    </div>
+</body>
+</html>
