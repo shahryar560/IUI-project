@@ -130,20 +130,25 @@
 
         <!-- AI Feature for Health Status -->
         <h3>Your Health Status</h3>
-        <div>
-        <button id="aiStatusButton" onclick="getHealthStatus()">Get My Status</button>
-        <div id="statusResponse" class="status-box"></div>
-        </div>
+<div>
+    <button id="aiStatusButton" onclick="getHealthStatus()">Get My Status</button>
+    <div id="statusResponse" class="status-box"></div>
+</div>
 
-        <script>
-        function getHealthStatus() {
+<script>
+    function getHealthStatus() {
         fetch('/get_health_status')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('statusResponse').textContent = data.status;
-        })
-        .catch(error => console.error('Error fetching health status:', error));
-}
+            .then(response => response.json())
+            .then(data => {
+                const statusBox = document.getElementById('statusResponse');
+                statusBox.textContent = data.status;
+
+                // Adjust height to fit content
+                statusBox.style.height = 'auto';
+                statusBox.style.height = statusBox.scrollHeight + 'px';
+            })
+            .catch(error => console.error('Error fetching health status:', error));
+    }
 </script>
 
 

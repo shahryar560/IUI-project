@@ -135,6 +135,9 @@ body[data-font-size="large"] {
     color: var(--text-color);
     font-size: 14px;
     min-height: 50px;
+    max-height: 200px; /* Limits box height */
+    overflow-y: auto;  /* Enables vertical scrolling if content exceeds max-height */
+    resize: none;  /* Prevents manual resizing */
 }
 .error-message {
     color: red;
