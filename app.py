@@ -212,7 +212,7 @@ def get_health_status():
         f"- Total Water Intake: {total_water} ml\n"
         f"- Total Walking Duration: {total_walk} minutes\n\n"
         "Please provide a short, encouraging health status summary that includes a brief evaluation "
-        "of the user's calorie intake, hydration, and physical activity."
+        "of the user's calorie intake, hydration, and physical activity. It should not be more than 3 lines."
     )
 
     # Send data to OpenAI's GPT model for a summary using ChatCompletion
