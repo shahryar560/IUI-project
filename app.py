@@ -58,7 +58,7 @@ class Food(db.Model):  # Database for storing food items
 
 # Load food database from CSV file
 def load_food_database():
-    with open('calories.csv', newline='') as csvfile:
+    with open('calories.csv', newline='', encoding='ISO-8859-1') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             try:
